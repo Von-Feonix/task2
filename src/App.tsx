@@ -1,4 +1,4 @@
-import { Form, Input, Button, Checkbox, Radio, RadioChangeEvent } from "antd";
+import { Form, Input, Button, Checkbox, Radio } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import "./App.css";
 import { Header } from "antd/lib/layout/layout";
