@@ -1,22 +1,56 @@
-import { Form, Input, Button, Checkbox, Radio, Row, Col } from "antd";
+import { Form, Input, Button, Checkbox, Radio, Row, Col, Space } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Header } from "antd/lib/layout/layout";
 import { Role } from "../lib/constant/role";
 import { LoginFormValues } from "../lib/model/login";
 import { useRouter } from "next/router";
+import Link from "next/link";
+import CryptoJS from "crypto-js";
 
 function Login() {
-  const onFinish = (values: any) => {
-    console.log("Received values of form: ", values);
-  };
-  const router = useRouter();
-  const login = async (loginRequest: LoginFormValues) => {
-    
-    console.log(loginRequest);
-    router.push("dashboard");
-    
-  };
+  const key = CryptoJS.enc.Utf8.parse("1234123412ABCDEF");
+  const iv = CryptoJS.enc.Utf8.parse("ABCDEF1234123412");
 
+  function Decrypt(word) {
+    let encryptedHexStr = CryptoJS.enc.Hex.parse(word);
+    let srcs = CryptoJS.enc.Base64.stringify(encryptedHexStr);
+    let decrypt = CryptoJS.AES.decrypt(srcs, key, {
+      iv: iv,
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7,
+    });
+    let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
+    return decryptedStr.toString();
+  }
+
+  const [form] = Form.useForm();
+  const router = useRouter();
+  let users = [];
+  const login = async (loginRequest: LoginFormValues) => {
+    console.log(loginRequest.email);
+    var canLogin = false;
+
+    for (var i = 1; i < localStorage.length + 1; i++) {
+      let loginUser = JSON.parse(localStorage.getItem("" + i));
+      if (loginRequest.email == loginUser.email) {
+        if (loginRequest.password == Decrypt(loginUser.password)) {
+          if (loginRequest.role == loginUser.role) {
+            console.log(loginUser);
+            canLogin = true;
+            router.push(
+              "dashboard/" +
+                loginRequest.role +
+                "Dashboard?email=" +
+                loginRequest.email
+            );
+          }
+        }
+      }
+    }
+    if (!canLogin) {
+      alert("Wrong password!");
+    }
+  };
 
   return (
     <>
@@ -39,7 +73,7 @@ function Login() {
             </Form.Item>
 
             <Form.Item
-              name="username"
+              name="email"
               rules={[{ required: true }, { type: "email" }]}
             >
               <Input
@@ -75,7 +109,10 @@ function Login() {
               >
                 Log in
               </Button>
-              No account? &nbsp;&nbsp; <a href="login.tsx">Sign up</a>
+              <Space>
+                <span>No account?</span>
+                <Link href="/signup">Sign up</Link>
+              </Space>
             </Form.Item>
           </Form>
         </Col>

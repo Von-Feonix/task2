@@ -1,3 +1,4 @@
+import internal from 'stream';
 import { Role } from '../constant/role';
 
 export interface LoginFormValues {
@@ -8,6 +9,7 @@ export interface LoginFormValues {
 }
 
 export interface RegisterFormValues {
+  id: number;
   email: string;
   password: string;
   role: string;
