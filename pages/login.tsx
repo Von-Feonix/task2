@@ -1,56 +1,40 @@
-import { Form, Input, Button, Checkbox, Radio, Row, Col, Space } from "antd";
+import { Form, Input, Button, Checkbox, Radio, Row, Col, Space, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Header } from "antd/lib/layout/layout";
 import { Role } from "../lib/constant/role";
 import { LoginFormValues } from "../lib/model/login";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import CryptoJS from "crypto-js";
+import { AES } from "crypto-js";
+import axios from "axios";
+import { useEffect } from "react";
+import storage from "../lib/services/storage";
 
 function Login() {
-  const key = CryptoJS.enc.Utf8.parse("1234123412ABCDEF");
-  const iv = CryptoJS.enc.Utf8.parse("ABCDEF1234123412");
-
-  function Decrypt(word) {
-    let encryptedHexStr = CryptoJS.enc.Hex.parse(word);
-    let srcs = CryptoJS.enc.Base64.stringify(encryptedHexStr);
-    let decrypt = CryptoJS.AES.decrypt(srcs, key, {
-      iv: iv,
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7,
-    });
-    let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
-    return decryptedStr.toString();
-  }
-
-  const [form] = Form.useForm();
   const router = useRouter();
-  let users = [];
   const login = async (loginRequest: LoginFormValues) => {
-    console.log(loginRequest.email);
-    var canLogin = false;
-
-    for (var i = 1; i < localStorage.length + 1; i++) {
-      let loginUser = JSON.parse(localStorage.getItem("" + i));
-      if (loginRequest.email == loginUser.email) {
-        if (loginRequest.password == Decrypt(loginUser.password)) {
-          if (loginRequest.role == loginUser.role) {
-            console.log(loginUser);
-            canLogin = true;
-            router.push(
-              "dashboard/" +
-                loginRequest.role +
-                "Dashboard?email=" +
-                loginRequest.email
-            );
-          }
+    const base = "http://cms.chtoma.com/api";
+    const { password, ...rest } = loginRequest;
+    axios
+      .post(`${base}/login`, {...rest, password: AES.encrypt(password, "cms").toString()})
+      .then((response) => {
+        const userInfo = response.data.data;
+        console.log(userInfo);
+        if (userInfo) {
+          localStorage.setItem("cms", JSON.stringify(userInfo));
+          router.push("/dashboard/managerDashboard");
         }
-      }
-    }
-    if (!canLogin) {
-      alert("Wrong password!");
-    }
+      })
+      .catch(function (error) {
+        console.log(error);
+        message.error(error.response.data.msg);
+      });
   };
+  useEffect(() => {
+    if (storage?.userInfo) {
+      router.push(`/dashboard/${storage.userInfo.role}`);
+    }
+  }, []);
 
   return (
     <>
