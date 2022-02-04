@@ -2,23 +2,23 @@ import { Form, Input, Button, Checkbox, Radio, Row, Col, Space, message } from "
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Header } from "antd/lib/layout/layout";
 import { Role } from "../lib/constant/role";
-import { LoginFormValues } from "../lib/model/login";
+import { LoginFormValues, LoginRequest,LoginResponse } from '../lib/model/login';
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { AES } from "crypto-js";
 import axios from "axios";
 import { useEffect } from "react";
 import storage from "../lib/services/storage";
+import { IResponse } from "../lib/model/api";
 
-function Login() {
+function Login() {  
   const router = useRouter();
-  const login = async (loginRequest: LoginFormValues) => {
+  const login = async (loginRequest: LoginRequest) => {
     const base = "http://cms.chtoma.com/api";
     const { password, ...rest } = loginRequest;
-    axios
-      .post(`${base}/login`, {...rest, password: AES.encrypt(password, "cms").toString()})
-      .then((response) => {
-        const userInfo = response.data.data;
+    await axios.post<IResponse<LoginResponse>>(`${base}/login`, {...rest, password: AES.encrypt(password, "cms").toString()})
+      .then(function (response){
+        const userInfo = response.data;
         console.log(userInfo);
         if (userInfo) {
           localStorage.setItem("cms", JSON.stringify(userInfo));
