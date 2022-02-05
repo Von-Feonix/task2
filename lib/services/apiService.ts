@@ -27,6 +27,7 @@ class ApiService {
         }
         return {};
     }
+    
     // to-do other method : register / logout / forget_password /
 
 }

@@ -14,9 +14,11 @@ import { IResponse } from "../lib/model/api";
 function Login() {  
   const router = useRouter();
   const login = async (loginRequest: LoginRequest) => {
+    
     const base = "http://cms.chtoma.com/api";
     const { password, ...rest } = loginRequest;
-    await axios.post<IResponse<LoginResponse>>(`${base}/login`, {...rest, password: AES.encrypt(password, "cms").toString()})
+
+    await axios.post<IResponse<LoginResponse>>(`${base}/login`, {...rest, password: AES.encrypt(password, 'cms').toString()})
       .then(function (response){
         const userInfo = response.data;
         console.log(userInfo);
@@ -30,11 +32,7 @@ function Login() {
         message.error(error.response.data.msg);
       });
   };
-  useEffect(() => {
-    if (storage?.userInfo) {
-      router.push(`/dashboard/${storage.userInfo.role}`);
-    }
-  }, []);
+  
 
   return (
     <>
