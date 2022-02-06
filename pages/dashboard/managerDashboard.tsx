@@ -1,70 +1,96 @@
-import React, { useEffect, useState } from 'react';
-import ReactDOM from "react-dom";
+import React, { useState } from "react";
 import "antd/dist/antd.css";
-import { Layout, Menu } from "antd";
+import { Layout, Menu, Breadcrumb } from "antd";
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
+  DesktopOutlined,
+  PieChartOutlined,
+  FileOutlined,
+  TeamOutlined,
   UserOutlined,
-  VideoCameraOutlined,
-  UploadOutlined
 } from "@ant-design/icons";
-import { withLatestFrom } from 'rxjs';
-import UserIcon from '../../lib/layout/userIcon';
+import styled from "styled-components";
+import UserIcon from "../../lib/layout/userIcon";
 
-const { Header, Sider, Content } = Layout;
+const { Header, Content, Footer, Sider } = Layout;
+const { SubMenu } = Menu;
 
+const LayoutHeader = styled(Header)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  color: white;
+`;
+const StyledContent = styled(Content)`
+  margin: 16px;
+  background-color: #fff;
+  padding: 16px;
+  min-height: auto;
+`;
 
+/* const MenuContainer = styled(Menu)`
+  height: 100%;
+  margin-top: -0.1px;
+  padding-top: 0.1px
+`; */
 
-export default function managerDashboard(){
+export default function DashLayout() {
+  console.log(JSON.parse(localStorage.getItem("cms")));
   let state = {
-    collapsed: false
+    collapsed: false,
   };
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [collapsed, toggleCollapse] = useState(false);
-  const toggle = () =>{
-    toggleCollapse(!collapsed)
-  }
-    return (
-      <Layout>
-        <Sider collapsible collapsed={collapsed} onCollapse={(isCollapsed) => toggleCollapse(isCollapsed)}>
-          <div className="logo" />
-          <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
-            <Menu.Item key="1" icon={<UserOutlined />}>
-              nav 1
-            </Menu.Item>
-            <Menu.Item key="2" icon={<VideoCameraOutlined />}>
-              nav 2
-            </Menu.Item>
-            <Menu.Item key="3" icon={<UploadOutlined />}>
-              nav 3
-            </Menu.Item>
-          </Menu>
-        </Sider>
-        <Layout className="site-layout">
-          <Header className="site-layout-background" style={{ padding: 0 }}>
-          {React.createElement(
-              state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
-              {
-                color: 'white',
-                className: "trigger",
-                onClick: toggle
-              } 
-            )}
-            <UserIcon/>
-          </Header>
-          <Content
-            className="site-layout-background2"
-            style={{
-              margin: "24px 16px",
-              padding: 24,
-              minHeight: 280
-            }}
-          >
-            Content
-          </Content>
-        </Layout>
-      </Layout>
-    );
-  }
 
+  const [collapsed, toggleCollapsed] = useState(false);
+  const toggle = () => {
+    toggleCollapsed(!collapsed);
+  };
+
+  return (
+    <Layout style={{ minHeight: "100vh" }}>
+      <Sider
+        collapsible
+        collapsed={collapsed}
+        onCollapse={(isCollapsed) => toggleCollapsed(isCollapsed)}
+      >
+        <div className="logo" />
+        <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
+          <Menu.Item key="1" icon={<PieChartOutlined />}>
+            Overview
+          </Menu.Item>
+          <SubMenu key="sub1" icon={<UserOutlined />} title="Student">
+            <Menu.Item key="2">Student File</Menu.Item>
+          </SubMenu>
+          <SubMenu key="sub2" icon={<TeamOutlined />} title="Course">
+            <Menu.Item key="5">Team 1</Menu.Item>
+            <Menu.Item key="6">Team 2</Menu.Item>
+          </SubMenu>
+          <Menu.Item key="7" icon={<FileOutlined />}>
+            Teacher
+          </Menu.Item>
+        </Menu>
+      </Sider>
+
+      <Layout className="site-layout">
+        <LayoutHeader className="site-layout-header">
+          {React.createElement(
+            state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
+            {
+              className: "trigger",
+              onClick: toggle,
+            }
+          )}
+          <UserIcon />
+        </LayoutHeader>
+        <Breadcrumb style={{ margin: "16px 0" }}>
+          <Breadcrumb.Item>System</Breadcrumb.Item>
+          <Breadcrumb.Item>Overview</Breadcrumb.Item>
+        </Breadcrumb>
+        <StyledContent className="site-layout-background">
+          Content
+        </StyledContent>
+      </Layout>
+    </Layout>
+  );
+}

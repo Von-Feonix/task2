@@ -21,10 +21,16 @@ export default function UserIcon() {
   const base = "http://cms.chtoma.com/api";
   
   const onLogout = async () => {
-    const isLogout = await axios
-      .post<IResponse<boolean>>(`${base}/logout`, {})
+    const userToken = JSON.parse(localStorage.getItem("cms")).data.token;
+    const  isLogout = await axios
+      .post<Promise<IResponse<boolean>>>(`${base}/logout`, {},{
+        headers:{
+          'Authorization' : `Bearer ${userToken}`
+        }
+      })
       .then((res) => res.data)
       .catch(function (error) {
+        console.log(isLogout);
         console.log(error);
         message.error(error.response.data.msg);
       });
