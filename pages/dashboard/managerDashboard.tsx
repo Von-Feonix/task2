@@ -37,7 +37,6 @@ const StyledContent = styled(Content)`
 `; */
 
 export default function DashLayout() {
-  console.log(JSON.parse(localStorage.getItem("cms")));
   let state = {
     collapsed: false,
   };

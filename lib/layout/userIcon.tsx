@@ -19,15 +19,19 @@ import { RootPath } from "../services/api-path";
 export default function UserIcon() {
   const router = useRouter();
   const base = "http://cms.chtoma.com/api";
-  
+
   const onLogout = async () => {
     const userToken = JSON.parse(localStorage.getItem("cms")).data.token;
-    const  isLogout = await axios
-      .post<Promise<IResponse<boolean>>>(`${base}/logout`, {},{
-        headers:{
-          'Authorization' : `Bearer ${userToken}`
+    const isLogout = await axios
+      .post<Promise<IResponse<boolean>>>(
+        `${base}/logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
         }
-      })
+      )
       .then((res) => res.data)
       .catch(function (error) {
         console.log(isLogout);
