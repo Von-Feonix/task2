@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Children, useState } from "react";
 import "antd/dist/antd.css";
 import { Layout, Menu, Breadcrumb } from "antd";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@ant-design/icons";
 import styled from "styled-components";
 import UserIcon from "../../lib/layout/userIcon";
+import { useRouter } from "next/router";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -44,7 +45,12 @@ export default function DashLayout() {
   const [collapsed, toggleCollapsed] = useState(false);
   const toggle = () => {
     toggleCollapsed(!collapsed);
+
   };
+  const router = useRouter();
+  const onclickStudentfile = () => {
+    router.push('manager/student/studentProfile');
+  }
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -59,7 +65,7 @@ export default function DashLayout() {
             Overview
           </Menu.Item>
           <SubMenu key="sub1" icon={<UserOutlined />} title="Student">
-            <Menu.Item key="2">Student File</Menu.Item>
+            <Menu.Item key="2" onClick={onclickStudentfile}>Student File</Menu.Item>
           </SubMenu>
           <SubMenu key="sub2" icon={<TeamOutlined />} title="Course">
             <Menu.Item key="5">Team 1</Menu.Item>
@@ -87,7 +93,7 @@ export default function DashLayout() {
           <Breadcrumb.Item>Overview</Breadcrumb.Item>
         </Breadcrumb>
         <StyledContent className="site-layout-background">
-          Content
+          context
         </StyledContent>
       </Layout>
     </Layout>

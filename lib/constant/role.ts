@@ -3,3 +3,4 @@ export enum Role {
   teacher = "teacher",
   manager = "manager",
 }
+export const businessAreas = ['China', 'New Zealand', 'Canada', 'Australia'];
