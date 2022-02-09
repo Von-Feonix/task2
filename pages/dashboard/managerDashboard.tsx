@@ -15,7 +15,6 @@ import UserIcon from "../../lib/layout/userIcon";
 import { useRouter } from "next/router";
 import StudentProfile from "./manager/student/studentProfile";
 
-
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
 
@@ -47,12 +46,11 @@ export default function DashLayout() {
   const [collapsed, toggleCollapsed] = useState(false);
   const toggle = () => {
     toggleCollapsed(!collapsed);
-
   };
   const router = useRouter();
   const onclickStudentfile = () => {
-    router.push('manager/student/studentProfile');
-  }
+    router.push("manager/student/studentProfile");
+  };
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -67,7 +65,9 @@ export default function DashLayout() {
             Overview
           </Menu.Item>
           <SubMenu key="sub1" icon={<UserOutlined />} title="Student">
-            <Menu.Item key="2" onClick={onclickStudentfile}>Student File</Menu.Item>
+            <Menu.Item key="2" onClick={onclickStudentfile}>
+              Student File
+            </Menu.Item>
           </SubMenu>
           <SubMenu key="sub2" icon={<TeamOutlined />} title="Course">
             <Menu.Item key="5">Team 1</Menu.Item>
@@ -95,7 +95,7 @@ export default function DashLayout() {
           <Breadcrumb.Item>Overview</Breadcrumb.Item>
         </Breadcrumb>
         <StyledContent className="site-layout-background">
-          <StudentProfile/>
+          <StudentProfile />
         </StyledContent>
       </Layout>
     </Layout>

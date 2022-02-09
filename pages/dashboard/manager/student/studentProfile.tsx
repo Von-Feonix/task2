@@ -44,22 +44,21 @@ export default function StudentProfile() {
   let data;
   useEffect(() => {
     axios
-      .get("http://cms.chtoma.com/api/students?page=1&limit=20", {
+      .get("http://cms.chtoma.com/api/students?page=1&limit=0", {
         headers: { Authorization: `Bearer ${userToken}` },
       })
-      .then(function (response) {       
-        // console.log(response.data.data.students[0]);
-
-        const studentProfile = response.data.data.students
-        if(studentProfile){
+      .then(function (response) {
+        const studentProfile = response.data.data.students;
+        if (studentProfile) {
+          console.log(studentProfile);
           setStudentProfile(studentProfile);
-        }       
+        }
       })
       .catch(function (error) {
         console.log(error);
       });
-  },[]);
-/*
+  }, []);
+  /*
   const { data, loading, paginator, setPaginator, total, setTotal, setData } = useListEffect<
     StudentsRequest,
     StudentsResponse,
@@ -67,61 +66,60 @@ export default function StudentProfile() {
   >(apiService.getStudents.bind(apiService), 'students', true, { query });
 */
 
-
-      const columns = [
-        {
-          // ？排序
-          title: "No.",
-          dataIndex: "id",
-          key: "id",
-        },
-        {
-          title: "Name",
-          dataIndex: "name",
-          key: "name",
-        },
-        {
-          title: "Area",
-          dataIndex: "country",
-          key: "area",
-        },
-        {
-          title: "Email",
-          dataIndex: "email",
-          key: "email",
-        },
-        {
-          // ？如何获取course.name
-          title: "Selected Curriculum",
-          dataIndex: "courses.name",
-          key: "courses",
-        },
-        {
-          title: "Student Type",
-          dataIndex: "",
-          key: "type",
-        },
-        {
-          // ？时间
-          title: "Join Time",
-          dataIndex: "createAt",
-          key: "createAt",
-        },
-        {
-          title: "Action",
-          key: "action",
-          render: () => (
-            <Space size="middle">
-              <a>Edit</ a>
-              <a>Delete</ a>
-            </Space>
-          ),
-        },
-      ];
-  const cancel = () => {
-    setModalDisplay(false);
-    setEditingStudent(null);
-  };
+  const columns = [
+    {
+      title: "No.",
+      key: "index",
+      render: (_1, _2, index) => index + 1,
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Area",
+      dataIndex: "country",
+      key: "area",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Selected Curriculum",
+      dataIndex: "courses",
+      key: "courses",
+      render: (courses: CourseShort[]) =>
+        courses?.map((item) => item.name).join(","),
+    },
+    {
+      title: "Student Type",
+      dataIndex: "type",
+      filters: [
+        { text: "developer", value: "developer" },
+        { text: "tester", value: "tester" },
+      ],
+      onFilter: (value: string, record: Student) => record.type.name === value,
+      render: (type: BaseType) => type?.name,
+    },
+    {
+      title: "Join Time",
+      dataIndex: "createAt",
+      key: "createAt",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: () => (
+        <Space size="middle">
+          <a>Edit</a>
+          <a>Delete</a>
+        </Space>
+      ),
+    },
+  ];
 
   return (
     <>
@@ -142,9 +140,7 @@ export default function StudentProfile() {
           onChange={debouncedQuery}
         />
       </FlexContainer>
-      <Table
-        dataSource={studentProfile} columns={columns}
-      ></Table>
+      <Table dataSource={studentProfile} columns={columns}></Table>
     </>
   );
 }

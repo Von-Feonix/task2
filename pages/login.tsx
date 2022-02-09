@@ -30,7 +30,7 @@ function Login() {
   const login = async (loginRequest: LoginRequest) => {
     const base = "http://cms.chtoma.com/api";
     const { password, ...rest } = loginRequest;
-    
+
     await axios
       .post<IResponse<LoginResponse>>(`${base}/login`, {
         ...rest,
