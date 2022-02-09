@@ -13,6 +13,8 @@ import {
 import styled from "styled-components";
 import UserIcon from "../../lib/layout/userIcon";
 import { useRouter } from "next/router";
+import StudentProfile from "./manager/student/studentProfile";
+
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -93,7 +95,7 @@ export default function DashLayout() {
           <Breadcrumb.Item>Overview</Breadcrumb.Item>
         </Breadcrumb>
         <StyledContent className="site-layout-background">
-          context
+          <StudentProfile/>
         </StyledContent>
       </Layout>
     </Layout>
