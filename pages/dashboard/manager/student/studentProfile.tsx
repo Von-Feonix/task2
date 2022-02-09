@@ -38,10 +38,8 @@ export default function StudentProfile() {
   const [studentProfile, setStudentProfile] = useState([]);
   const debouncedQuery = useDebounceSearch(setQuery);
   const [isModalDisplay, setModalDisplay] = useState(false);
-  const base = "http://cms.chtoma.com/api";
   const [editingStudent, setEditingStudent] = useState<Student>(null);
   const userToken = JSON.parse(localStorage.getItem("cms")).data.token;
-  let data;
   useEffect(() => {
     axios
       .get("http://cms.chtoma.com/api/students?page=1&limit=0", {
@@ -57,7 +55,7 @@ export default function StudentProfile() {
       .catch(function (error) {
         console.log(error);
       });
-  }, []);
+  }, [userToken]);
   /*
   const { data, loading, paginator, setPaginator, total, setTotal, setData } = useListEffect<
     StudentsRequest,
@@ -70,7 +68,7 @@ export default function StudentProfile() {
     {
       title: "No.",
       key: "index",
-      render: (_1, _2, index) => index + 1,
+      render: (_text: unknown, _record: unknown, index: number) => index + 1,
     },
     {
       title: "Name",
@@ -90,24 +88,18 @@ export default function StudentProfile() {
     {
       title: "Selected Curriculum",
       dataIndex: "courses",
-      key: "courses",
+      key:"courses",
       render: (courses: CourseShort[]) =>
-        courses?.map((item) => item.name).join(","),
+        courses?.map((item) => item.name).join(", "),
     },
     {
       title: "Student Type",
       dataIndex: "type",
-      filters: [
-        { text: "developer", value: "developer" },
-        { text: "tester", value: "tester" },
-      ],
-      onFilter: (value: string, record: Student) => record.type.name === value,
       render: (type: BaseType) => type?.name,
     },
     {
       title: "Join Time",
-      dataIndex: "createAt",
-      key: "createAt",
+      dataIndex: "createdAt",
     },
     {
       title: "Action",
