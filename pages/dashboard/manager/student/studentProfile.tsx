@@ -21,6 +21,9 @@ import apiService from "../../../../lib/services/apiService";
 import { genCommonTableProps } from "../../../../lib/util/tableHelper";
 import axios from "axios";
 import { async } from "rxjs";
+import ManagerLayout from "../../managerDashboard";
+import AddStudentForm from "../../../../lib/layout/addStudentForm";
+
 
 const Search = styled(Input.Search)`
   width: 30%;
@@ -56,13 +59,6 @@ export default function StudentProfile() {
         console.log(error);
       });
   }, [userToken]);
-  /*
-  const { data, loading, paginator, setPaginator, total, setTotal, setData } = useListEffect<
-    StudentsRequest,
-    StudentsResponse,
-    Student
-  >(apiService.getStudents.bind(apiService), 'students', true, { query });
-*/
 
   const columns = [
     {
@@ -88,7 +84,7 @@ export default function StudentProfile() {
     {
       title: "Selected Curriculum",
       dataIndex: "courses",
-      key:"courses",
+      key: "courses",
       render: (courses: CourseShort[]) =>
         courses?.map((item) => item.name).join(", "),
     },
@@ -100,21 +96,73 @@ export default function StudentProfile() {
     {
       title: "Join Time",
       dataIndex: "createdAt",
+      render: (value: string) => formatDistanceToNow(new Date(value), { addSuffix: true }),
     },
     {
       title: "Action",
-      key: "action",
-      render: () => (
+      dataIndex: "action",
+      render: (_, record: Student) => (
         <Space size="middle">
-          <a>Edit</a>
-          <a>Delete</a>
+          <TextLink
+            onClick={() => {
+              setEditingStudent(record);
+              setModalDisplay(true);
+            }}
+          >
+            Edit
+          </TextLink>
+
+          <Popconfirm
+            title="Are you sure to delete?"
+            onConfirm={()=>
+            {
+              console.log(record.id);
+              axios.delete(`http://cms.chtoma.com/api/students/${record.id}`, {
+                headers: { Authorization: `Bearer ${userToken}` },
+              }) 
+              .then(function (response) {
+                const {data:isDeleted} = response;
+                if (isDeleted) {
+                  
+                }
+              })
+              .catch(function (error) {
+                console.log(error);
+              });
+            }
+          }
+            /*
+            onConfirm={() => {
+              apiService.deleteStudent(record.id).then((res) => {
+                const { data: isDeleted } = res;
+
+                if (isDeleted) {
+                  const index = data.findIndex((item) => item.id === record.id);
+                  const updatedData = [...data];
+
+                  updatedData.splice(index, 1);
+                  setData(updatedData);
+                  setTotal(total - 1);
+                }
+              });
+            }}
+            */
+            
+            okText="Confirm"
+            cancelText="Cancel"
+          >
+            <TextLink>Delete</TextLink>
+          </Popconfirm>
         </Space>
       ),
     },
   ];
-
+  const cancel = () => {
+    setModalDisplay(false);
+    setEditingStudent(null);
+  };
   return (
-    <>
+    <ManagerLayout>
       <FlexContainer>
         <Button
           type="primary"
@@ -128,11 +176,37 @@ export default function StudentProfile() {
         </Button>
         <Search
           placeholder="Search by name"
-          onSearch={(value) => setQuery(value)}
+          onSearch={value => {
+            console.log(value);
+            (value) => setQuery(value)
+          }}
           onChange={debouncedQuery}
         />
       </FlexContainer>
       <Table dataSource={studentProfile} columns={columns}></Table>
-    </>
+      <ModalForm
+        title={!!editingStudent ? 'Edit Student' : 'Add Student'}
+        centered
+        visible={isModalDisplay}
+        cancel={cancel}
+      >
+        <AddStudentForm
+          onFinish={(student: Student) => {
+            /**
+             * update local data if editing success
+            
+            if (!!editingStudent) {
+              const index = data.findIndex((item) => item.id === student.id);
+
+              data[index] = student;
+              setData([...data]);
+            }*/
+
+            setModalDisplay(false);
+          }}
+          student={editingStudent}
+        />
+      </ModalForm>
+    </ManagerLayout>
   );
 }

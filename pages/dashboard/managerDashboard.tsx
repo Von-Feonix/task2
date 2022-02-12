@@ -14,6 +14,7 @@ import styled from "styled-components";
 import UserIcon from "../../lib/layout/userIcon";
 import { useRouter } from "next/router";
 import StudentProfile from "./manager/student/studentProfile";
+import Link from "next/link";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -38,7 +39,7 @@ const StyledContent = styled(Content)`
   padding-top: 0.1px
 `; */
 
-export default function DashLayout() {
+export default function DashLayout({ children }: any) {
   let state = {
     collapsed: false,
   };
@@ -48,9 +49,13 @@ export default function DashLayout() {
     toggleCollapsed(!collapsed);
   };
   const router = useRouter();
-  const onclickStudentfile = () => {
-    router.push("manager/student/studentProfile");
-  };
+  const [currentMenuItem, setCurrentMenuItem] = useState('/manager'); 
+  const handleClick = (e:any) => {
+    console.log('click ', e);
+    setCurrentMenuItem(
+      e.key
+    )
+  }
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -60,13 +65,23 @@ export default function DashLayout() {
         onCollapse={(isCollapsed) => toggleCollapsed(isCollapsed)}
       >
         <div className="logo" />
-        <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
+        <Menu 
+        theme="dark" 
+        mode="inline"
+        onClick = {handleClick}
+        selectedKeys={[currentMenuItem]}
+        defaultSelectedKeys={['/manager']}
+        >
           <Menu.Item key="1" icon={<PieChartOutlined />}>
+            <Link href={"http://localhost:3000/dashboard/managerDashboard"}>
             Overview
+            </Link>
           </Menu.Item>
           <SubMenu key="sub1" icon={<UserOutlined />} title="Student">
-            <Menu.Item key="2" onClick={onclickStudentfile}>
+            <Menu.Item key="manager/students">
+            <Link href="http://localhost:3000/dashboard/manager/student/studentProfile">
               Student File
+              </Link>
             </Menu.Item>
           </SubMenu>
           <SubMenu key="sub2" icon={<TeamOutlined />} title="Course">
@@ -95,7 +110,7 @@ export default function DashLayout() {
           <Breadcrumb.Item>Overview</Breadcrumb.Item>
         </Breadcrumb>
         <StyledContent className="site-layout-background">
-          <StudentProfile />
+          {children}
         </StyledContent>
       </Layout>
     </Layout>
