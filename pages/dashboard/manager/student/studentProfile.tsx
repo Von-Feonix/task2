@@ -23,7 +23,7 @@ import axios from "axios";
 import { async } from "rxjs";
 import ManagerLayout from "../../managerDashboard";
 import AddStudentForm from "../../../../lib/layout/addStudentForm";
-
+import storage from "../../../../lib/services/storage";
 
 const Search = styled(Input.Search)`
   width: 30%;
@@ -42,7 +42,7 @@ export default function StudentProfile() {
   const debouncedQuery = useDebounceSearch(setQuery);
   const [isModalDisplay, setModalDisplay] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student>(null);
-  const userToken = JSON.parse(localStorage.getItem("cms")).data.token;
+  const userToken = storage.token;
   useEffect(() => {
     axios
       .get("http://cms.chtoma.com/api/students?page=1&limit=0", {
@@ -96,7 +96,8 @@ export default function StudentProfile() {
     {
       title: "Join Time",
       dataIndex: "createdAt",
-      render: (value: string) => formatDistanceToNow(new Date(value), { addSuffix: true }),
+      render: (value: string) =>
+        formatDistanceToNow(new Date(value), { addSuffix: true }),
     },
     {
       title: "Action",
@@ -114,40 +115,21 @@ export default function StudentProfile() {
 
           <Popconfirm
             title="Are you sure to delete?"
-            onConfirm={()=>
-            {
-              console.log(record.id);
-              axios.delete(`http://cms.chtoma.com/api/students/${record.id}`, {
-                headers: { Authorization: `Bearer ${userToken}` },
-              }) 
-              .then(function (response) {
-                const {data:isDeleted} = response;
-                if (isDeleted) {
-                  
-                }
-              })
-              .catch(function (error) {
-                console.log(error);
-              });
-            }
-          }
-            /*
             onConfirm={() => {
-              apiService.deleteStudent(record.id).then((res) => {
-                const { data: isDeleted } = res;
-
-                if (isDeleted) {
-                  const index = data.findIndex((item) => item.id === record.id);
-                  const updatedData = [...data];
-
-                  updatedData.splice(index, 1);
-                  setData(updatedData);
-                  setTotal(total - 1);
-                }
-              });
+              console.log(record.id);
+              axios
+                .delete(`http://cms.chtoma.com/api/students/${record.id}`, {
+                  headers: { Authorization: `Bearer ${userToken}` },
+                })
+                .then(function (response) {
+                  const { data: isDeleted } = response;
+                  if (isDeleted) {
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
             }}
-            */
-            
             okText="Confirm"
             cancelText="Cancel"
           >
@@ -176,16 +158,13 @@ export default function StudentProfile() {
         </Button>
         <Search
           placeholder="Search by name"
-          onSearch={value => {
-            console.log(value);
-            (value) => setQuery(value)
-          }}
+          onSearch={(value) => setQuery(value)}
           onChange={debouncedQuery}
         />
       </FlexContainer>
       <Table dataSource={studentProfile} columns={columns}></Table>
       <ModalForm
-        title={!!editingStudent ? 'Edit Student' : 'Add Student'}
+        title={!!editingStudent ? "Edit Student" : "Add Student"}
         centered
         visible={isModalDisplay}
         cancel={cancel}

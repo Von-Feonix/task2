@@ -1,10 +1,12 @@
-import { Button, Form, Input, Select } from 'antd';
-import React from 'react';
-import styled from 'styled-components';
-import { businessAreas} from '../constant/role';
-import { validateMessages } from '../constant/config'
-import { AddStudentRequest, Student } from '../model/student';
-import axios from 'axios';
+import { Button, Form, Input, Select } from "antd";
+import React from "react";
+import styled from "styled-components";
+import { businessAreas } from "../constant/role";
+import { validateMessages } from "../constant/config";
+import { AddStudentRequest, Student } from "../model/student";
+import axios from "axios";
+import apiService from "../services/apiService";
+import storage from "../services/storage";
 
 const ModalFormSubmit = styled(Form.Item)`
   position: absolute;
@@ -19,10 +21,12 @@ export interface AddStudentFormProps {
   student?: Student;
 }
 
-export default function AddStudentForm(props: AddStudentFormProps): JSX.Element {
+export default function AddStudentForm(
+  props: AddStudentFormProps
+): JSX.Element {
   const [form] = Form.useForm();
   const { onFinish, student } = props;
-  const userToken = JSON.parse(localStorage.getItem("cms")).data.token;
+  const userToken = storage.token;
   return (
     <Form
       labelCol={{ span: 6 }}
@@ -30,33 +34,19 @@ export default function AddStudentForm(props: AddStudentFormProps): JSX.Element 
       form={form}
       validateMessages={validateMessages}
       onFinish={(values: AddStudentFormValues) => {
-          console.log(userToken);
-          console.log(values);
+        console.log(userToken);
+        console.log(values);
         const response = !student
-          ? 
-            axios.post("http://cms.chtoma.com/api/students", {
-              data:{name:values.name,email:values.email,country:values.country,type:values.type}
-            },{
-                headers: { "Authorization": `Bearer ${userToken}`,"Content-Type":"application/json"}
-            })
-            .catch(function (error) {
-              console.log(error);
-            })
-            
-           :
-              //apiService.updateStudent({ ...values, id: student.id });
-              axios.put("http://cms.chtoma.com/api/students", {
-                data:{name:values.name,email:values.email,country:values.country,type:values.type}
-              },{
-                  headers: { Authorization: `Bearer ${userToken}`}
-              })
-              .catch(function (error) {
-                console.log(error);
-              })
+          ? apiService.addStudent(values)
+          : apiService.updateStudent({ ...values, id: student.id });
+        response.then((response) => {
+          const { data } = response;
 
-
-      }
-    }
+          if (onFinish && data) {
+            onFinish(data);
+          }
+        });
+      }}
       initialValues={{
         name: student?.name,
         email: student?.email,
@@ -68,7 +58,11 @@ export default function AddStudentForm(props: AddStudentFormProps): JSX.Element 
         <Input type="text" placeholder="student name" />
       </Form.Item>
 
-      <Form.Item label="Email" name="email" rules={[{ type: 'email' }, { required: true }]}>
+      <Form.Item
+        label="Email"
+        name="email"
+        rules={[{ type: "email" }, { required: true }]}
+      >
         <Input type="email" placeholder="email" />
       </Form.Item>
 
@@ -103,7 +97,7 @@ export default function AddStudentForm(props: AddStudentFormProps): JSX.Element 
             //   !!form.getFieldsError().filter(({ errors }) => errors.length).length
             // }
           >
-            {!!student ? 'Update' : 'Add'}
+            {!!student ? "Update" : "Add"}
           </Button>
         )}
       </ModalFormSubmit>

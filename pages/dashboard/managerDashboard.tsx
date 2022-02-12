@@ -49,13 +49,11 @@ export default function DashLayout({ children }: any) {
     toggleCollapsed(!collapsed);
   };
   const router = useRouter();
-  const [currentMenuItem, setCurrentMenuItem] = useState('/manager'); 
-  const handleClick = (e:any) => {
-    console.log('click ', e);
-    setCurrentMenuItem(
-      e.key
-    )
-  }
+  const [currentMenuItem, setCurrentMenuItem] = useState("/manager");
+  const handleClick = (e: any) => {
+    console.log("click ", e);
+    setCurrentMenuItem(e.key);
+  };
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -65,22 +63,22 @@ export default function DashLayout({ children }: any) {
         onCollapse={(isCollapsed) => toggleCollapsed(isCollapsed)}
       >
         <div className="logo" />
-        <Menu 
-        theme="dark" 
-        mode="inline"
-        onClick = {handleClick}
-        selectedKeys={[currentMenuItem]}
-        defaultSelectedKeys={['/manager']}
+        <Menu
+          theme="dark"
+          mode="inline"
+          onClick={handleClick}
+          selectedKeys={[currentMenuItem]}
+          defaultSelectedKeys={["/manager"]}
         >
           <Menu.Item key="1" icon={<PieChartOutlined />}>
             <Link href={"http://localhost:3000/dashboard/managerDashboard"}>
-            Overview
+              Overview
             </Link>
           </Menu.Item>
           <SubMenu key="sub1" icon={<UserOutlined />} title="Student">
             <Menu.Item key="manager/students">
-            <Link href="http://localhost:3000/dashboard/manager/student/studentProfile">
-              Student File
+              <Link href="http://localhost:3000/dashboard/manager/student/studentProfile">
+                Student File
               </Link>
             </Menu.Item>
           </SubMenu>

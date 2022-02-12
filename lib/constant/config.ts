@@ -1,4 +1,4 @@
-import { Gutter } from 'antd/lib/grid/row';
+import { Gutter } from "antd/lib/grid/row";
 
 const typeTemplate = "'${name}' is not a valid ${type}";
 

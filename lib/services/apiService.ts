@@ -1,7 +1,7 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { AES } from "crypto-js";
-import { IResponse } from "../model/api";
-import { LoginFormValues, LoginResponse } from "../model/login";
+import { IResponse, QueryParams } from "../model/api";
+import { LoginFormValues, LoginRequest, LoginResponse } from "../model/login";
 import getConfig from "next/config";
 import {
   AddStudentRequest,
@@ -13,36 +13,111 @@ import {
   UpdateStudentResponse,
 } from "../model/student";
 import { RootPath, SubPath } from "./api-path";
+import { storage } from "./storage";
+import { message } from "antd";
 
 const { publicRuntimeConfig } = getConfig();
-const baseURL = `http://cms.chtoma.com/api`;
-
+const baseURL = "http://cms.chtoma.com/api";
 const axiosInstance = axios.create({
   baseURL,
+  withCredentials: true,
   responseType: "json",
 });
 
-class ApiService {
-  public async login({
-    password,
-    ...rest
-  }: LoginFormValues): Promise<IResponse<LoginResponse> | any> {
-    const response = await axiosInstance
-      .post(baseURL, {
-        ...rest,
-        password: AES.encrypt(password, "cms").toString(),
-      })
-      .then((response) => response.data)
-      .catch((err) => {
-        throw err.message;
-      });
-    if (response && response.data) {
-      return response.data;
-    }
-    return {};
+axiosInstance.interceptors.request.use((config) => {
+  if (!config.url.includes("login")) {
+    return {
+      ...config,
+      headers: {
+        ...config.headers,
+        Authorization: "Bearer " + storage?.token,
+      },
+    };
   }
 
-  // to-do other method : register / logout / forget_password /
+  return config;
+});
+type IPath = (string | number)[] | string | number;
+
+class BaseApiService {
+  protected async post<T>(path: IPath, params: object): Promise<T> {
+    return axiosInstance
+      .post(this.getPath(path), params)
+      .then((res) => res.data)
+      .catch(this.errorHandler);
+  }
+
+  protected async put<T>(path: IPath, params: object): Promise<T> {
+    return axiosInstance
+      .put(this.getPath(path), params)
+      .then((res) => res.data)
+      .catch(this.errorHandler);
+  }
+
+  protected isError(code: number): boolean {
+    return !(
+      code.toString().startsWith("2") || code.toString().startsWith("3")
+    );
+  }
+
+  protected showMessage =
+    (isSuccessDisplay = false) =>
+    (res: IResponse): IResponse => {
+      const { code, msg } = res;
+      const isError = this.isError(code);
+
+      if (isError) {
+        message.error(msg);
+      }
+
+      if (isSuccessDisplay && !isError) {
+        message.success(msg);
+      }
+
+      return res;
+    };
+
+  private errorHandler(err: AxiosError<IResponse>): IResponse {
+    const msg = err.response?.data.msg ?? "unknown error";
+    const code = err.response?.status ?? -1;
+
+    if (!err.response) {
+      console.error(
+        "%c [ err ]-149",
+        "font-size:13px; background:pink; color:#bf2c9f;",
+        err
+      );
+    }
+
+    return { msg, code };
+  }
+
+  private getPath(path: IPath): string {
+    return !Array.isArray(path) ? String(path) : path.join("/");
+  }
+}
+
+class ApiService extends BaseApiService {
+  login({
+    password,
+    ...rest
+  }: LoginRequest): Promise<IResponse<LoginResponse>> {
+    return this.post<IResponse<LoginResponse>>(RootPath.login, {
+      ...rest,
+      password: AES.encrypt(password, "cms").toString(),
+    }).then(this.showMessage());
+  }
+
+  addStudent(req: AddStudentRequest): Promise<IResponse<AddStudentResponse>> {
+    console.log(storage.token);
+    return this.post([RootPath.students], req).then(this.showMessage(true));
+  }
+
+  updateStudent(
+    req: UpdateStudentRequest
+  ): Promise<IResponse<UpdateStudentResponse>> {
+    return this.put([RootPath.students], req).then(this.showMessage(true));
+  }
 }
 
 export const APIService = new ApiService();
