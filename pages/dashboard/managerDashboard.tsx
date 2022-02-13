@@ -13,7 +13,6 @@ import {
 import styled from "styled-components";
 import UserIcon from "../../lib/layout/userIcon";
 import { useRouter } from "next/router";
-import StudentProfile from "./manager/student/studentProfile";
 import Link from "next/link";
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -71,15 +70,11 @@ export default function DashLayout({ children }: any) {
           defaultSelectedKeys={["/manager"]}
         >
           <Menu.Item key="1" icon={<PieChartOutlined />}>
-            <Link href={"http://localhost:3000/dashboard/managerDashboard"}>
-              Overview
-            </Link>
+            <Link href="/dashboard/manager/homepage">Overview</Link>
           </Menu.Item>
           <SubMenu key="sub1" icon={<UserOutlined />} title="Student">
             <Menu.Item key="manager/students">
-              <Link href="http://localhost:3000/dashboard/manager/student/studentProfile">
-                Student File
-              </Link>
+              <Link href="/dashboard/manager/student/">Student File</Link>
             </Menu.Item>
           </SubMenu>
           <SubMenu key="sub2" icon={<TeamOutlined />} title="Course">
@@ -103,10 +98,7 @@ export default function DashLayout({ children }: any) {
           )}
           <UserIcon />
         </LayoutHeader>
-        <Breadcrumb style={{ margin: "16px 0" }}>
-          <Breadcrumb.Item>System</Breadcrumb.Item>
-          <Breadcrumb.Item>Overview</Breadcrumb.Item>
-        </Breadcrumb>
+
         <StyledContent className="site-layout-background">
           {children}
         </StyledContent>

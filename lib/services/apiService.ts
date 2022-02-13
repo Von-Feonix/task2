@@ -40,6 +40,19 @@ axiosInstance.interceptors.request.use((config) => {
 type IPath = (string | number)[] | string | number;
 
 class BaseApiService {
+  protected async get<T>(path: IPath, params?: QueryParams): Promise<T> {
+    path = this.getPath(path);
+    path = !!params
+      ? `${path}?${Object.entries(params)
+          .map(([key, value]) => `${key}=${value}`)
+          .join("&")}`
+      : path;
+
+    return axiosInstance
+      .get(path)
+      .then((res) => res.data)
+      .catch((err) => this.errorHandler(err));
+  }
   protected async post<T>(path: IPath, params: object): Promise<T> {
     return axiosInstance
       .post(this.getPath(path), params)
@@ -106,6 +119,13 @@ class ApiService extends BaseApiService {
       ...rest,
       password: AES.encrypt(password, "cms").toString(),
     }).then(this.showMessage());
+  }
+
+  getStudents(req?: StudentsRequest): Promise<IResponse<StudentsResponse>> {
+    return this.get<IResponse<StudentsResponse>>(
+      RootPath.students,
+      req as unknown as QueryParams
+    );
   }
 
   addStudent(req: AddStudentRequest): Promise<IResponse<AddStudentResponse>> {

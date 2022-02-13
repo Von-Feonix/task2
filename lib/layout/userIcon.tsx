@@ -1,27 +1,19 @@
-import {
-  LogoutOutlined,
-  ProfileOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { Avatar, Dropdown, Menu, message } from "antd";
-import Link from "antd/lib/typography/Link";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { Role } from "../constant/role";
-import apiService from "../services/apiService";
+import React, { useState } from "react";
 import storage from "../../lib/services/storage";
 import { useUserRole } from "../loginState";
 import { HeaderIcon } from "./styles";
 import axios from "axios";
 import { IResponse } from "../model/api";
-import { RootPath } from "../services/api-path";
 
 export default function UserIcon() {
   const router = useRouter();
   const base = "http://cms.chtoma.com/api";
 
   const onLogout = async () => {
-    const userToken = JSON.parse(localStorage.getItem("cms")).data.token;
+    const userToken = storage.token;
     const isLogout = await axios
       .post<Promise<IResponse<boolean>>>(
         `${base}/logout`,

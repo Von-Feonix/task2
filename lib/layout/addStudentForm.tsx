@@ -4,7 +4,6 @@ import styled from "styled-components";
 import { businessAreas } from "../constant/role";
 import { validateMessages } from "../constant/config";
 import { AddStudentRequest, Student } from "../model/student";
-import axios from "axios";
 import apiService from "../services/apiService";
 import storage from "../services/storage";
 

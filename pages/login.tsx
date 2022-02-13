@@ -1,29 +1,11 @@
-import {
-  Form,
-  Input,
-  Button,
-  Checkbox,
-  Radio,
-  Row,
-  Col,
-  Space,
-  message,
-} from "antd";
+import { Form, Input, Button, Checkbox, Radio, Row, Col, Space } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Header } from "antd/lib/layout/layout";
 import { Role } from "../lib/constant/role";
-import {
-  LoginFormValues,
-  LoginRequest,
-  LoginResponse,
-} from "../lib/model/login";
+import { LoginFormValues } from "../lib/model/login";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { AES } from "crypto-js";
-import axios from "axios";
-import { useEffect } from "react";
 import storage from "../lib/services/storage";
-import { IResponse } from "../lib/model/api";
 import apiService from "../lib/services/apiService";
 
 function Login() {
@@ -33,7 +15,7 @@ function Login() {
 
     if (!!data) {
       storage.setUserInfo(data);
-      router.push('/dashboard/managerDashboard');
+      router.push("/dashboard/manager/homepage");
     }
   };
   return (
