@@ -26,7 +26,6 @@ axiosInstance.interceptors.request.use((config) => {
   console.log(config);
   if (!config.url.includes("login")) {
     return {
-      
       ...config,
       headers: {
         ...config.headers,
@@ -128,7 +127,6 @@ class ApiService extends BaseApiService {
   }
 
   addStudent(req: AddStudentRequest): Promise<IResponse<AddStudentResponse>> {
-    
     return this.post([RootPath.students], req).then(this.showMessage(true));
   }
 

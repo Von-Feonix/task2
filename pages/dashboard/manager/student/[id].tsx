@@ -5,13 +5,11 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import ManagerLayout from "../../managerDashboard";
-import { BaseType } from "../../../../lib/model/api";
-import { Course } from "../../../../lib/model/course";
+import { Course, CourseShort } from "../../../../lib/model/course";
 import { StudentResponse } from "../../../../lib/model/student";
-import axios from "axios";
-import { IResponse } from "../../../../lib/model/api";
 import storage from "../../../../lib/services/storage";
 import Link from "next/link";
+import apiService from "../../../../lib/services/apiService";
 
 export const H3 = styled.h3`
   color: #7356f1;
@@ -34,7 +32,7 @@ export default function Page(props: { id: number }) {
     {
       title: "No.",
       key: "index",
-      render: (_1, _2, index) => index + 1,
+      render: (_text: unknown, _record: unknown, index: number) => index + 1,
     },
     {
       title: "Name",
@@ -43,7 +41,7 @@ export default function Page(props: { id: number }) {
     {
       title: "Type",
       dataIndex: "type",
-      render: (type: BaseType[]) => type.map((item) => item.name).join(","),
+      render: (courses: CourseShort[]) => courses.map((item) => item.name).join(","),
     },
     {
       title: "Join Time",
@@ -54,45 +52,38 @@ export default function Page(props: { id: number }) {
   useEffect(() => {
     (async () => {
       const id = +router.query.id || props.id;
-      const { data } = await axios.get<Promise<IResponse<StudentResponse>>>(
-        `http://cms.chtoma.com/api/students/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      );
+      const { data } = await apiService.getStudentById(id);
       const info = [
-        { label: "Name", value: (await data).data.name },
-        { label: "Age", value: (await data).data.age },
-        { label: "Email", value: (await data).data.email },
-        { label: "Phone", value: (await data).data.phone },
+        { label: "Name", value:  data.name },
+        { label: "Age", value: data.age },
+        { label: "Email", value: data.email },
+        { label: "Phone", value: data.phone },
       ];
       const about = [
-        { label: "Eduction", value: (await data).data.education },
-        { label: "Area", value: (await data).data.country },
+        { label: "Eduction", value: data.education },
+        { label: "Area", value: data.country },
         {
           label: "Gender",
-          value: (await data).data.gender === 1 ? "Male" : "Female",
+          value: data.gender === 1 ? "Male" : "Female",
         },
         {
           label: "Member Period",
           value:
-            (await data).data.memberStartAt +
+            data.memberStartAt +
             " - " +
-            (await data).data.memberEndAt,
+            data.memberEndAt,
         },
-        { label: "Type", value: (await data).data.type.name },
-        { label: "Create Time", value: (await data).data.ctime },
-        { label: "Update Time", value: (await data).data.updateAt },
+        { label: "Type", value: data.type.name },
+        { label: "Create Time", value: data.ctime },
+        { label: "Update Time", value: data.updateAt },
       ];
 
       setInfo(info);
-      setCourses((await data).data.courses);
+      setCourses(data.courses);
       setAbout(about);
-      setData((await data).data);
+      setData(data);
     })();
-  }, []);
+  }, [props.id, router.query.id, userToken]);
 
   return (
     <ManagerLayout>
@@ -166,7 +157,7 @@ export default function Page(props: { id: number }) {
 
                 <Row gutter={[6, 16]}>
                   <Col>
-                    {data?.interest.map((item, index) => (
+                    {data?.interest.map((item) => (
                       <Tag key={item} style={{ padding: "5px 10px" }}>
                         {item}
                       </Tag>

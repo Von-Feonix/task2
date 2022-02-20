@@ -15,7 +15,16 @@ function Login() {
 
     if (!!data) {
       storage.setUserInfo(data);
-      router.push("/dashboard/manager/homepage");
+      console.log(data);
+      if (data.role === "manager") {
+        router.push("/dashboard/manager/homepage");
+      }
+      if (data.role === "teacher") {
+        router.push("/dashboard/teacher/homepage");
+      }
+      if (data.role === "student") {
+        router.push("/dashboard/student/homepage");
+      }
     }
   };
   return (

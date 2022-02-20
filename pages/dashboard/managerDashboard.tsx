@@ -1,10 +1,9 @@
-import React, { Children, useState } from "react";
+import React, { useState } from "react";
 import "antd/dist/antd.css";
-import { Layout, Menu, Breadcrumb } from "antd";
+import { Affix, Layout, Menu } from "antd";
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
-  DesktopOutlined,
   PieChartOutlined,
   FileOutlined,
   TeamOutlined,
@@ -15,7 +14,7 @@ import UserIcon from "../../lib/layout/userIcon";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Header, Content, Sider } = Layout;
 const { SubMenu } = Menu;
 
 const LayoutHeader = styled(Header)`
@@ -38,7 +37,7 @@ const StyledContent = styled(Content)`
   padding-top: 0.1px
 `; */
 
-export default function DashLayout({ children }: any) {
+export default function ManagerDashboardLayout({ children }: any) {
   let state = {
     collapsed: false,
   };
@@ -55,54 +54,56 @@ export default function DashLayout({ children }: any) {
   };
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <Sider
-        collapsible
-        collapsed={collapsed}
-        onCollapse={(isCollapsed) => toggleCollapsed(isCollapsed)}
-      >
-        <div className="logo" />
-        <Menu
-          theme="dark"
-          mode="inline"
-          onClick={handleClick}
-          selectedKeys={[currentMenuItem]}
-          defaultSelectedKeys={["/manager"]}
+    <Affix>
+      <Layout style={{ minHeight: "100vh" }}>
+        <Sider
+          collapsible
+          collapsed={collapsed}
+          onCollapse={(isCollapsed) => toggleCollapsed(isCollapsed)}
         >
-          <Menu.Item key="1" icon={<PieChartOutlined />}>
-            <Link href="/dashboard/manager/homepage">Overview</Link>
-          </Menu.Item>
-          <SubMenu key="sub1" icon={<UserOutlined />} title="Student">
-            <Menu.Item key="manager/students">
-              <Link href="/dashboard/manager/student/">Student File</Link>
+          <div className="logo" />
+          <Menu
+            theme="dark"
+            mode="inline"
+            onClick={handleClick}
+            selectedKeys={[currentMenuItem]}
+            defaultSelectedKeys={["/manager"]}
+          >
+            <Menu.Item key="1" icon={<PieChartOutlined />}>
+              <Link href="/dashboard/manager/homepage">Overview</Link>
             </Menu.Item>
-          </SubMenu>
-          <SubMenu key="sub2" icon={<TeamOutlined />} title="Course">
-            <Menu.Item key="5">Team 1</Menu.Item>
-            <Menu.Item key="6">Team 2</Menu.Item>
-          </SubMenu>
-          <Menu.Item key="7" icon={<FileOutlined />}>
-            Teacher
-          </Menu.Item>
-        </Menu>
-      </Sider>
+            <SubMenu key="sub1" icon={<UserOutlined />} title="Student">
+              <Menu.Item key="manager/students">
+                <Link href="/dashboard/manager/student/">Student File</Link>
+              </Menu.Item>
+            </SubMenu>
+            <SubMenu key="sub2" icon={<TeamOutlined />} title="Course">
+              <Menu.Item key="5">Team 1</Menu.Item>
+              <Menu.Item key="6">Team 2</Menu.Item>
+            </SubMenu>
+            <Menu.Item key="7" icon={<FileOutlined />}>
+              Teacher
+            </Menu.Item>
+          </Menu>
+        </Sider>
 
-      <Layout className="site-layout">
-        <LayoutHeader className="site-layout-header">
-          {React.createElement(
-            state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
-            {
-              className: "trigger",
-              onClick: toggle,
-            }
-          )}
-          <UserIcon />
-        </LayoutHeader>
+        <Layout className="site-layout">
+          <LayoutHeader className="site-layout-header">
+            {React.createElement(
+              state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
+              {
+                className: "trigger",
+                onClick: toggle,
+              }
+            )}
+            <UserIcon />
+          </LayoutHeader>
 
-        <StyledContent className="site-layout-background">
-          {children}
-        </StyledContent>
+          <StyledContent className="site-layout-background">
+            {children}
+          </StyledContent>
+        </Layout>
       </Layout>
-    </Layout>
+    </Affix>
   );
 }

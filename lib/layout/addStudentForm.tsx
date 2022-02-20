@@ -3,9 +3,12 @@ import React from "react";
 import styled from "styled-components";
 import { businessAreas } from "../constant/role";
 import { validateMessages } from "../constant/config";
-import { AddStudentRequest, Student } from "../model/student";
+import { AddStudentRequest, AddStudentResponse, Student } from "../model/student";
 import apiService from "../services/apiService";
 import storage from "../services/storage";
+import axios from "axios";
+import { IResponse, QueryParams } from "../model/api";
+import { json } from "node:stream/consumers";
 
 const ModalFormSubmit = styled(Form.Item)`
   position: absolute;
@@ -37,6 +40,14 @@ export default function AddStudentForm(
         console.log(values);
         const response = !student
           ? apiService.addStudent(values)
+          /*axios.post<Promise<IResponse<AddStudentResponse>>>("http://cms.chtoma.com/api/students",
+          {
+            headers:{
+              Authorization: `Bearer ${userToken}`,
+            },
+            data:JSON.stringify(values)
+          }
+          )*/
           : apiService.updateStudent({ ...values, id: student.id });
         response.then((response) => {
           const { data } = response;

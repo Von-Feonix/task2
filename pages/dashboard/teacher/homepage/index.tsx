@@ -1,14 +1,14 @@
 import { Breadcrumb } from "antd";
 import React from "react";
-import ManagerLayout from "../../managerDashboard";
+import TeacherLayout from "../../teacherDashboard";
 
 export default function Overview() {
   return (
-    <ManagerLayout>
+    <TeacherLayout>
       <Breadcrumb style={{ margin: "16px 0" }}>
-        <Breadcrumb.Item>CMS Manager System</Breadcrumb.Item>
+        <Breadcrumb.Item>CMS Teacher System</Breadcrumb.Item>
         <Breadcrumb.Item>Overview</Breadcrumb.Item>
       </Breadcrumb>
-    </ManagerLayout>
+    </TeacherLayout>
   );
 }
