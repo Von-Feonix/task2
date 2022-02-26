@@ -33,13 +33,7 @@ export default function Page() {
       render: (ary: CourseShort[]) => (
         <>
           {ary.map((item) => (
-            <Space key={item.id}>
-              <Link
-                href={`/dashboard/${storage.role}/courses/${item.courseId}`}
-              >
-                {item.name}
-              </Link>
-            </Space>
+            <Space key={item.id}>{item.name}</Space>
           ))}
         </>
       ),

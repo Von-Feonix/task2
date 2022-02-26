@@ -21,6 +21,7 @@ import ManagerLayout from "../../managerDashboard";
 import AddStudentForm from "../../../../lib/layout/addStudentForm";
 import storage from "../../../../lib/services/storage";
 import Link from "next/link";
+import { businessAreas } from "../../../../lib/constant/role";
 
 const Search = styled(Input.Search)`
   width: 30%;
@@ -47,7 +48,7 @@ export default function StudentProfile() {
       true,
       { query }
     );
-    
+
   /*useEffect(() => {
     axios
       .get("http://cms.chtoma.com/api/students?page=1&limit=0", {
@@ -75,14 +76,24 @@ export default function StudentProfile() {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      sorter: (pre: Student, next: Student) => {
+        const preCode = pre.name.charCodeAt(0);
+        const nextCode = next.name.charCodeAt(0);
+        return preCode > nextCode ? 1 : preCode === nextCode ? 0 : -1;
+      },
       render: (_, record: Student) => (
-        <Link href={`/dashboard/manager/student/${record.id}`}>{record.name}</Link>
+        <Link href={`/dashboard/manager/student/${record.id}`}>
+          {record.name}
+        </Link>
       ),
     },
     {
       title: "Area",
       dataIndex: "country",
       key: "area",
+      filters: businessAreas.map((item) => ({ text: item, value: item })),
+      onFilter: (value: string, record: Student) =>
+        record.country.includes(value),
     },
     {
       title: "Email",
@@ -99,6 +110,11 @@ export default function StudentProfile() {
     {
       title: "Student Type",
       dataIndex: "type",
+      filters: [
+        { text: "developer", value: "developer" },
+        { text: "tester", value: "tester" },
+      ],
+      onFilter: (value: string, record: Student) => record.type.name === value,
       render: (type: BaseType) => type?.name,
     },
     {

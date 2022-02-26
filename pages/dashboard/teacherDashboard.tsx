@@ -11,8 +11,9 @@ import {
 } from "@ant-design/icons";
 import styled from "styled-components";
 import UserIcon from "../../lib/layout/userIcon";
-import { useRouter } from "next/router";
+import { Router, useRouter } from "next/router";
 import Link from "next/link";
+import withRouter, { WithRouterProps } from "next/dist/client/with-router";
 
 const { Header, Content, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -31,13 +32,18 @@ const StyledContent = styled(Content)`
   min-height: auto;
 `;
 
+interface Props extends WithRouterProps {
+  router: Router;
+}
+
 /* const MenuContainer = styled(Menu)`
   height: 100%;
   margin-top: -0.1px;
   padding-top: 0.1px
 `; */
 
-export default function DashLayout({ children }: any) {
+const TeacherDashboardLayout = (props: React.PropsWithChildren<Props>) => {
+  
   let state = {
     collapsed: false,
   };
@@ -53,6 +59,10 @@ export default function DashLayout({ children }: any) {
     setCurrentMenuItem(e.key);
   };
 
+  const pathname = props.router.pathname;
+  const pathsplit: string[] = pathname.split("/");
+  const selectedKeys = pathsplit.pop();
+
   return (
     <Affix>
       <Layout style={{ minHeight: "100vh" }}>
@@ -66,14 +76,14 @@ export default function DashLayout({ children }: any) {
             theme="dark"
             mode="inline"
             onClick={handleClick}
-            selectedKeys={[currentMenuItem]}
-            defaultSelectedKeys={["/teacher"]}
+            selectedKeys={[selectedKeys]}
+          defaultOpenKeys={[selectedKeys + "s"]}
           >
-            <Menu.Item key="1" icon={<PieChartOutlined />}>
+            <Menu.Item key="homepage" icon={<PieChartOutlined />}>
               <Link href="/dashboard/teacher/homepage">Overview</Link>
             </Menu.Item>
-            <SubMenu key="sub1" icon={<UserOutlined />} title="Student">
-              <Menu.Item key="teacher/students">
+            <SubMenu key="students" icon={<UserOutlined />} title="Student">
+              <Menu.Item key="student">
                 <Link href="/dashboard/teacher/student/">Student File</Link>
               </Menu.Item>
             </SubMenu>
@@ -97,10 +107,11 @@ export default function DashLayout({ children }: any) {
           </LayoutHeader>
 
           <StyledContent className="site-layout-background">
-            {children}
+            {props.children}
           </StyledContent>
         </Layout>
       </Layout>
     </Affix>
   );
 }
+export default withRouter(TeacherDashboardLayout);

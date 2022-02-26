@@ -9,8 +9,9 @@ import {
 } from "@ant-design/icons";
 import styled from "styled-components";
 import UserIcon from "../../lib/layout/userIcon";
-import { useRouter } from "next/router";
+import { Router, useRouter } from "next/router";
 import Link from "next/link";
+import withRouter, { WithRouterProps } from "next/dist/client/with-router";
 
 const { Header, Content, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -29,13 +30,17 @@ const StyledContent = styled(Content)`
   min-height: auto;
 `;
 
+interface Props extends WithRouterProps {
+  router: Router;
+}
+
 /* const MenuContainer = styled(Menu)`
   height: 100%;
   margin-top: -0.1px;
   padding-top: 0.1px
 `; */
 
-export default function ManagerDashboardLayout({ children }: any) {
+const StudentDashboardLayout = (props: React.PropsWithChildren<Props>) => {
   let state = {
     collapsed: false,
   };
@@ -90,10 +95,11 @@ export default function ManagerDashboardLayout({ children }: any) {
           </LayoutHeader>
 
           <StyledContent className="site-layout-background">
-            {children}
+            {props.children}
           </StyledContent>
         </Layout>
       </Layout>
     </Affix>
   );
 }
+export default withRouter(StudentDashboardLayout);
