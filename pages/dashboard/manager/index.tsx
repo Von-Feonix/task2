@@ -1,6 +1,6 @@
 import { Breadcrumb } from "antd";
 import React from "react";
-import ManagerLayout from "../../managerDashboard";
+import ManagerLayout from "../managerDashboard";
 
 export default function Overview() {
   return (

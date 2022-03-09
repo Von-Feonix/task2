@@ -1,22 +1,21 @@
-import React, { Children, useState } from "react";
+/* eslint-disable react-hooks/rules-of-hooks */
+import React, { useState } from "react";
 import "antd/dist/antd.css";
-import { Layout, Menu, Breadcrumb } from "antd";
+import { Layout, Menu } from "antd";
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
-  DesktopOutlined,
-  PieChartOutlined,
-  FileOutlined,
-  TeamOutlined,
-  UserOutlined,
 } from "@ant-design/icons";
 import styled from "styled-components";
 import UserIcon from "../../lib/layout/userIcon";
-import { useRouter } from "next/router";
+import { Router, withRouter } from "next/router";
 import Link from "next/link";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { routes, SideNav } from "../../lib/constant/routes";
+import { generateKey, getActiveKey } from "../../lib/layout/sidenav";
+import { useUserRole } from "../../lib/loginState";
 
-const { Header, Content, Footer, Sider } = Layout;
-const { SubMenu } = Menu;
+const { Header, Content, Sider } = Layout;
 
 const LayoutHeader = styled(Header)`
   display: flex;
@@ -32,27 +31,66 @@ const StyledContent = styled(Content)`
   min-height: auto;
 `;
 
-/* const MenuContainer = styled(Menu)`
-  height: 100%;
-  margin-top: -0.1px;
-  padding-top: 0.1px
-`; */
+interface Props extends WithRouterProps {
+  router: Router;
+}
 
-export default function DashLayout({ children }: any) {
+const getMenuConfig = (
+  data: SideNav[]
+): { defaultSelectedKeys: string[]; defaultOpenKeys: string[] } => {
+  const key = getActiveKey(data);
+  const defaultSelectedKeys = [key.split('/').pop()];
+  const defaultOpenKeys = key.split('/').slice(0, -1);
+
+  return { defaultSelectedKeys, defaultOpenKeys };
+};
+
+function renderMenuItems(data: SideNav[], parent = ''): JSX.Element[] {
+  const userRole = useUserRole();
+
+  return data.map((item, index) => {
+    const key = generateKey(item, index);
+
+    if (item.subNav && !!item.subNav.length) {
+      return (
+        <Menu.SubMenu key={key} title={item.label} icon={item.icon}>
+          {renderMenuItems(item.subNav, item.path.join('/'))}
+        </Menu.SubMenu>
+      );
+    } else {
+      return item.hide ? null : (
+        <Menu.Item key={key} title={item.label} icon={item.icon}>
+          {!!item.path.length || item.label.toLocaleLowerCase() === 'overview' ? (
+            <Link
+              href={['/dashboard', userRole, parent, ...item.path]
+                .filter((item) => !!item)
+                .join('/')}
+              replace
+            >
+              {item.label}
+            </Link>
+          ) : (
+            item.label
+          )}
+        </Menu.Item>
+      );
+    }
+  });
+}
+
+const ManagerDashboardLayout = (props: React.PropsWithChildren<Props>) => {
   let state = {
     collapsed: false,
   };
-
+  console.log(props.router);
   const [collapsed, toggleCollapsed] = useState(false);
   const toggle = () => {
     toggleCollapsed(!collapsed);
   };
-  const router = useRouter();
-  const [currentMenuItem, setCurrentMenuItem] = useState("/manager");
-  const handleClick = (e: any) => {
-    console.log("click ", e);
-    setCurrentMenuItem(e.key);
-  };
+  const userRole = useUserRole();
+  const sideNave = routes.get(userRole);
+  const menuItems = renderMenuItems(sideNave);
+  const { defaultOpenKeys, defaultSelectedKeys } = getMenuConfig(sideNave);
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -65,25 +103,10 @@ export default function DashLayout({ children }: any) {
         <Menu
           theme="dark"
           mode="inline"
-          onClick={handleClick}
-          selectedKeys={[currentMenuItem]}
-          defaultSelectedKeys={["/manager"]}
+          defaultOpenKeys={defaultOpenKeys}
+          defaultSelectedKeys={defaultSelectedKeys}
         >
-          <Menu.Item key="1" icon={<PieChartOutlined />}>
-            <Link href="/dashboard/manager/homepage">Overview</Link>
-          </Menu.Item>
-          <SubMenu key="sub1" icon={<UserOutlined />} title="Student">
-            <Menu.Item key="manager/students">
-              <Link href="/dashboard/manager/student/">Student File</Link>
-            </Menu.Item>
-          </SubMenu>
-          <SubMenu key="sub2" icon={<TeamOutlined />} title="Course">
-            <Menu.Item key="5">Team 1</Menu.Item>
-            <Menu.Item key="6">Team 2</Menu.Item>
-          </SubMenu>
-          <Menu.Item key="7" icon={<FileOutlined />}>
-            Teacher
-          </Menu.Item>
+          {menuItems}
         </Menu>
       </Sider>
 
@@ -99,10 +122,12 @@ export default function DashLayout({ children }: any) {
           <UserIcon />
         </LayoutHeader>
 
+
         <StyledContent className="site-layout-background">
-          {children}
+          {props.children}
         </StyledContent>
       </Layout>
     </Layout>
   );
-}
+};
+export default withRouter(ManagerDashboardLayout);

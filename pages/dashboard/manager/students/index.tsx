@@ -49,23 +49,6 @@ export default function StudentProfile() {
       { query }
     );
 
-  /*useEffect(() => {
-    axios
-      .get("http://cms.chtoma.com/api/students?page=1&limit=0", {
-        headers: { Authorization: `Bearer ${userToken}` },
-      })
-      .then(function (response) {
-        const studentProfile = response.data.data.students;
-        if (studentProfile) {
-          console.log(studentProfile);
-          setStudentProfile(studentProfile);
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }, [userToken]);*/
-
   const columns = [
     {
       title: "No.",

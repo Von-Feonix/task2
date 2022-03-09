@@ -82,19 +82,11 @@ export default function AddStudentForm(
         </Select>
       </Form.Item>
 
-      {/**
-       * Antd BUG: https://github.com/ant-design/ant-design/issues/28208
-       * email 必须touched后表单状态才符合预期
-       */}
       <ModalFormSubmit shouldUpdate={true}>
         {() => (
           <Button
             type="primary"
             htmlType="submit"
-            // disabled={
-            //   !form.isFieldsTouched(true) ||
-            //   !!form.getFieldsError().filter(({ errors }) => errors.length).length
-            // }
           >
             {!!student ? "Update" : "Add"}
           </Button>

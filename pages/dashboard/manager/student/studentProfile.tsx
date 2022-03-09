@@ -1,27 +1,29 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Breadcrumb, Button, Input, Popconfirm, Space, Table } from "antd";
+import { Button, Input, Popconfirm, Space, Table } from "antd";
+import { ColumnType } from "antd/lib/table";
 import TextLink from "antd/lib/typography/Link";
 import { formatDistanceToNow } from "date-fns";
-import React, { useState } from "react";
+import Link from "next/link";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import ModalForm from "../../../../lib/common/modalForm";
 import { useDebounceSearch } from "../../../../lib/custom-hooks/debounceSearch";
 import { useListEffect } from "../../../../lib/custom-hooks/listEffect";
+import { businessAreas } from "../../../../lib/constant/role";
 import {
   Student,
   StudentsRequest,
   StudentsResponse,
 } from "../../../../lib/model/student";
-import { BaseType } from "../../../../lib/model/api";
+import { BaseType, IResponse } from "../../../../lib/model/api";
 import { CourseShort } from "../../../../lib/model/course";
 import apiService from "../../../../lib/services/apiService";
 import { genCommonTableProps } from "../../../../lib/util/tableHelper";
 import axios from "axios";
+import { async } from "rxjs";
 import ManagerLayout from "../../managerDashboard";
 import AddStudentForm from "../../../../lib/layout/addStudentForm";
 import storage from "../../../../lib/services/storage";
-import Link from "next/link";
-import { businessAreas } from "../../../../lib/constant/role";
 
 const Search = styled(Input.Search)`
   width: 30%;
@@ -36,20 +38,12 @@ const FlexContainer = styled.div`
 `;
 export default function StudentProfile() {
   const [query, setQuery] = useState<string>("");
+  const [studentProfile, setStudentProfile] = useState([]);
   const debouncedQuery = useDebounceSearch(setQuery);
   const [isModalDisplay, setModalDisplay] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student>(null);
   const userToken = storage.token;
-
-  const { data, loading, paginator, setPaginator, total, setData } =
-    useListEffect<StudentsRequest, StudentsResponse, Student>(
-      apiService.getStudents.bind(apiService),
-      "students",
-      true,
-      { query }
-    );
-
-  /*useEffect(() => {
+  useEffect(() => {
     axios
       .get("http://cms.chtoma.com/api/students?page=1&limit=0", {
         headers: { Authorization: `Bearer ${userToken}` },
@@ -64,7 +58,7 @@ export default function StudentProfile() {
       .catch(function (error) {
         console.log(error);
       });
-  }, [userToken]);*/
+  }, [userToken]);
 
   const columns = [
     {
@@ -76,24 +70,11 @@ export default function StudentProfile() {
       title: "Name",
       dataIndex: "name",
       key: "name",
-      sorter: (pre: Student, next: Student) => {
-        const preCode = pre.name.charCodeAt(0);
-        const nextCode = next.name.charCodeAt(0);
-        return preCode > nextCode ? 1 : preCode === nextCode ? 0 : -1;
-      },
-      render: (_, record: Student) => (
-        <Link href={`/dashboard/manager/student/${record.id}`}>
-          {record.name}
-        </Link>
-      ),
     },
     {
       title: "Area",
       dataIndex: "country",
       key: "area",
-      filters: businessAreas.map((item) => ({ text: item, value: item })),
-      onFilter: (value: string, record: Student) =>
-        record.country.includes(value),
     },
     {
       title: "Email",
@@ -110,11 +91,6 @@ export default function StudentProfile() {
     {
       title: "Student Type",
       dataIndex: "type",
-      filters: [
-        { text: "developer", value: "developer" },
-        { text: "tester", value: "tester" },
-      ],
-      onFilter: (value: string, record: Student) => record.type.name === value,
       render: (type: BaseType) => type?.name,
     },
     {
@@ -169,13 +145,6 @@ export default function StudentProfile() {
   };
   return (
     <ManagerLayout>
-      <Breadcrumb style={{ margin: "16px 0" }}>
-        <Breadcrumb.Item>
-          <Link href="/dashboard/manager/homepage">System</Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>Student</Breadcrumb.Item>
-      </Breadcrumb>
-
       <FlexContainer>
         <Button
           type="primary"
@@ -193,29 +162,24 @@ export default function StudentProfile() {
           onChange={debouncedQuery}
         />
       </FlexContainer>
-      <Table
-        {...genCommonTableProps({
-          data,
-          paginator,
-          loading,
-          setPaginator,
-          columns,
-          total,
-        })}
-      ></Table>
+      <Table dataSource={studentProfile} columns={columns}></Table>
       <ModalForm
-        title={editingStudent ? "Edit Student" : "Add Student"}
+        title={!!editingStudent ? "Edit Student" : "Add Student"}
         centered
         visible={isModalDisplay}
         cancel={cancel}
       >
         <AddStudentForm
           onFinish={(student: Student) => {
-            if (editingStudent) {
+            /**
+             * update local data if editing success
+            
+            if (!!editingStudent) {
               const index = data.findIndex((item) => item.id === student.id);
+
               data[index] = student;
               setData([...data]);
-            }
+            }*/
 
             setModalDisplay(false);
           }}

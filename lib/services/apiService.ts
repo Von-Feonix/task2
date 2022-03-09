@@ -14,6 +14,7 @@ import {
 import { RootPath } from "./api-path";
 import { storage } from "./storage";
 import { message } from "antd";
+import { CourseRequest, CourseResponse } from "../model/course";
 
 const baseURL = "http://cms.chtoma.com/api";
 const axiosInstance = axios.create({
@@ -26,7 +27,6 @@ axiosInstance.interceptors.request.use((config) => {
   console.log(config);
   if (!config.url.includes("login")) {
     return {
-      
       ...config,
       headers: {
         ...config.headers,
@@ -128,7 +128,6 @@ class ApiService extends BaseApiService {
   }
 
   addStudent(req: AddStudentRequest): Promise<IResponse<AddStudentResponse>> {
-    
     return this.post([RootPath.students], req).then(this.showMessage(true));
   }
 
@@ -141,6 +140,11 @@ class ApiService extends BaseApiService {
   getStudentById(id: number): Promise<IResponse<StudentResponse>> {
     return this.get([RootPath.students, id]).then(this.showMessage());
   }
+
+  getCourses<T = CourseResponse>(req: Partial<CourseRequest>): Promise<IResponse<T>> {
+    return this.get(RootPath.courses, req).then(this.showMessage());
+  }
+  
 }
 
 export const APIService = new ApiService();
