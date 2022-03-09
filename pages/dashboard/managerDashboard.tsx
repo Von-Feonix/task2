@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState } from "react";
 import "antd/dist/antd.css";
@@ -5,17 +6,35 @@ import { Layout, Menu } from "antd";
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
+=======
+import React, { useState } from "react";
+import "antd/dist/antd.css";
+import { Breadcrumb, Layout, Menu } from "antd";
+import {
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+  PieChartOutlined,
+  FileOutlined,
+  TeamOutlined,
+  UserOutlined,
+>>>>>>> d507b15c46014e12e7ef483d5a93b5ce291e2442
 } from "@ant-design/icons";
 import styled from "styled-components";
 import UserIcon from "../../lib/layout/userIcon";
 import { Router, withRouter } from "next/router";
 import Link from "next/link";
 import { WithRouterProps } from "next/dist/client/with-router";
+<<<<<<< HEAD
 import { routes, SideNav } from "../../lib/constant/routes";
 import { generateKey, getActiveKey } from "../../lib/layout/sidenav";
 import { useUserRole } from "../../lib/loginState";
 
 const { Header, Content, Sider } = Layout;
+=======
+
+const { Header, Content, Sider } = Layout;
+const { SubMenu } = Menu;
+>>>>>>> d507b15c46014e12e7ef483d5a93b5ce291e2442
 
 const LayoutHeader = styled(Header)`
   display: flex;
@@ -35,6 +54,7 @@ interface Props extends WithRouterProps {
   router: Router;
 }
 
+<<<<<<< HEAD
 const getMenuConfig = (
   data: SideNav[]
 ): { defaultSelectedKeys: string[]; defaultOpenKeys: string[] } => {
@@ -77,21 +97,38 @@ function renderMenuItems(data: SideNav[], parent = ''): JSX.Element[] {
     }
   });
 }
+=======
+/* const MenuContainer = styled(Menu)`
+  height: 100%;
+  margin-top: -0.1px;
+  padding-top: 0.1px
+`; */
+>>>>>>> d507b15c46014e12e7ef483d5a93b5ce291e2442
 
 const ManagerDashboardLayout = (props: React.PropsWithChildren<Props>) => {
   let state = {
     collapsed: false,
   };
+<<<<<<< HEAD
   console.log(props.router);
+=======
+  
+>>>>>>> d507b15c46014e12e7ef483d5a93b5ce291e2442
   const [collapsed, toggleCollapsed] = useState(false);
   const toggle = () => {
     toggleCollapsed(!collapsed);
   };
+<<<<<<< HEAD
   const userRole = useUserRole();
   const sideNave = routes.get(userRole);
   const menuItems = renderMenuItems(sideNave);
   const { defaultOpenKeys, defaultSelectedKeys } = getMenuConfig(sideNave);
+=======
+>>>>>>> d507b15c46014e12e7ef483d5a93b5ce291e2442
 
+  const pathname = props.router.pathname;
+  const pathsplit: string[] = pathname.split("/");
+  const selectedKeys = pathsplit.pop();
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Sider
@@ -103,10 +140,31 @@ const ManagerDashboardLayout = (props: React.PropsWithChildren<Props>) => {
         <Menu
           theme="dark"
           mode="inline"
+<<<<<<< HEAD
           defaultOpenKeys={defaultOpenKeys}
           defaultSelectedKeys={defaultSelectedKeys}
         >
           {menuItems}
+=======
+          selectedKeys={[selectedKeys]}
+          defaultOpenKeys={[selectedKeys + "s"]}
+        >
+          <Menu.Item key="homepage" icon={<PieChartOutlined />}>
+            <Link href="/dashboard/manager/homepage">Overview</Link>
+          </Menu.Item>
+          <SubMenu key="students" icon={<UserOutlined />} title="Student">
+            <Menu.Item key="student">
+              <Link href="/dashboard/manager/student/">Student File</Link>
+            </Menu.Item>
+          </SubMenu>
+          <SubMenu key="sub2" icon={<TeamOutlined />} title="Course">
+            <Menu.Item key="5">Team 1</Menu.Item>
+            <Menu.Item key="6">Team 2</Menu.Item>
+          </SubMenu>
+          <Menu.Item key="7" icon={<FileOutlined />}>
+            Teacher
+          </Menu.Item>
+>>>>>>> d507b15c46014e12e7ef483d5a93b5ce291e2442
         </Menu>
       </Sider>
 

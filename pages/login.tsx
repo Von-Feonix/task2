@@ -17,7 +17,11 @@ function Login() {
       storage.setUserInfo(data);
       console.log(data);
       if (data.role === "manager") {
+<<<<<<< HEAD
         router.push("/dashboard/manager");
+=======
+        router.push("/dashboard/manager/homepage");
+>>>>>>> d507b15c46014e12e7ef483d5a93b5ce291e2442
       }
       if (data.role === "teacher") {
         router.push("/dashboard/teacher/homepage");
